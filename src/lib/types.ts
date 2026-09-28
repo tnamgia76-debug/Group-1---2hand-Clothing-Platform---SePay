@@ -1,24 +1,24 @@
-// ===== PRODUCT =====
-export interface Product {
+// ===== COURT =====
+export interface Court {
   id: number;
   name: string;
   slug: string;
-  price: number;
+  pricePerHour: number;
   image: string;
   images?: string[];
-  category: string;
+  location: string;
   description: string;
-  sizes: string[];
-  colors: string[];
-  inStock: boolean;
+  amenities: string[]; // Trà đá, Wifi, Giữ xe, Thảm xịn...
+  isAvailable: boolean;
 }
 
-// ===== CART =====
+// ===== BOOKING / CART =====
 export interface CartItem {
-  product: Product;
-  quantity: number;
-  selectedSize: string;
-  selectedColor: string;
+  court: Court;
+  date: string; // YYYY-MM-DD
+  timeSlot: string; // VD: "18:00 - 19:30"
+  duration: number; // số giờ, VD: 1.5
+  price: number;
 }
 
 export interface CartState {
@@ -29,8 +29,7 @@ export interface CartState {
 
 export type CartAction =
   | { type: "ADD_ITEM"; payload: CartItem }
-  | { type: "REMOVE_ITEM"; payload: { productId: number; size: string; color: string } }
-  | { type: "UPDATE_QUANTITY"; payload: { productId: number; size: string; color: string; quantity: number } }
+  | { type: "REMOVE_ITEM"; payload: { courtId: number; date: string; timeSlot: string } }
   | { type: "CLEAR_CART" };
 
 // ===== PAYMENT =====
@@ -41,7 +40,6 @@ export interface PaymentRequest {
   buyerName: string;
   buyerPhone: string;
   buyerEmail?: string;
-  buyerAddress?: string;
   items: PaymentItem[];
 }
 
