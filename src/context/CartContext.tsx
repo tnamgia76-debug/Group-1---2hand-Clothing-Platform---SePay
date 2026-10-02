@@ -1,24 +1,22 @@
 "use client";
 
 import React, { createContext, useContext, useReducer, useEffect, useState } from "react";
-import { Product } from "@/lib/products";
 
-export interface CartItem {
-  product: Product;
-  quantity: number;
-  selectedSize: string;
-  selectedColor: string;
+export interface BookingItem {
+  court: any;
+  date: string;
+  timeSlot: string;
+  price: number;
 }
 
 interface CartState {
-  items: CartItem[];
+  items: BookingItem[];
 }
 
 type CartAction =
-  | { type: "INIT_CART"; payload: CartItem[] }
-  | { type: "ADD_TO_CART"; payload: CartItem }
-  | { type: "REMOVE_FROM_CART"; payload: { productId: number; size: string; color: string } }
-  | { type: "UPDATE_QUANTITY"; payload: { productId: number; size: string; color: string; quantity: number } }
+  | { type: "INIT_CART"; payload: BookingItem[] }
+  | { type: "ADD_TO_CART"; payload: BookingItem }
+  | { type: "REMOVE_FROM_CART"; payload: { courtId: string; date: string; timeSlot: string } }
   | { type: "CLEAR_CART" };
 
 const initialState: CartState = {
@@ -35,39 +33,17 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
     case "INIT_CART":
       return { ...state, items: action.payload };
     case "ADD_TO_CART": {
-      const existingItemIndex = state.items.findIndex(
-        (item) =>
-          item.product.id === action.payload.product.id &&
-          item.selectedSize === action.payload.selectedSize &&
-          item.selectedColor === action.payload.selectedColor
+      const exists = state.items.some(
+        (i) => i.court.id === action.payload.court.id && i.date === action.payload.date && i.timeSlot === action.payload.timeSlot
       );
-
-      if (existingItemIndex > -1) {
-        const newItems = [...state.items];
-        newItems[existingItemIndex].quantity += action.payload.quantity;
-        return { ...state, items: newItems };
-      }
+      if (exists) return state;
       return { ...state, items: [...state.items, action.payload] };
     }
     case "REMOVE_FROM_CART":
       return {
         ...state,
         items: state.items.filter(
-          (item) =>
-            !(item.product.id === action.payload.productId &&
-              item.selectedSize === action.payload.size &&
-              item.selectedColor === action.payload.color)
-        ),
-      };
-    case "UPDATE_QUANTITY":
-      return {
-        ...state,
-        items: state.items.map((item) =>
-          item.product.id === action.payload.productId &&
-          item.selectedSize === action.payload.size &&
-          item.selectedColor === action.payload.color
-            ? { ...item, quantity: action.payload.quantity }
-            : item
+          (i) => !(i.court.id === action.payload.courtId && i.date === action.payload.date && i.timeSlot === action.payload.timeSlot)
         ),
       };
     case "CLEAR_CART":
@@ -83,22 +59,20 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     setIsMounted(true);
-    const savedCart = localStorage.getItem("cart");
-    if (savedCart) {
+    const saved = localStorage.getItem("smashcourt_cart");
+    if (saved) {
       try {
-        const parsedCart = JSON.parse(savedCart);
-        if (parsedCart.items) {
-          dispatch({ type: "INIT_CART", payload: parsedCart.items });
+        const parsed = JSON.parse(saved);
+        if (parsed.items) {
+          dispatch({ type: "INIT_CART", payload: parsed.items });
         }
-      } catch (error) {
-        console.error("Failed to parse cart from local storage", error);
-      }
+      } catch (e) {}
     }
   }, []);
 
   useEffect(() => {
     if (isMounted) {
-      localStorage.setItem("cart", JSON.stringify(state));
+      localStorage.setItem("smashcourt_cart", JSON.stringify(state));
     }
   }, [state, isMounted]);
 
@@ -111,8 +85,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useCart = () => {
   const context = useContext(CartContext);
-  if (!context) {
-    throw new Error("useCart must be used within a CartProvider");
-  }
+  if (!context) throw new Error("useCart must be used within CartProvider");
   return context;
 };

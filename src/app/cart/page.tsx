@@ -2,108 +2,92 @@
 
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
-import { formatVND } from "@/lib/utils";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function CartPage() {
   const { state, dispatch } = useCart();
-  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
 
-  const subtotal = state.items.reduce(
-    (total, item) => total + item.product.price * item.quantity,
-    0
-  );
-  const shipping = subtotal > 0 ? 30000 : 0;
-  const total = subtotal + shipping;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  const updateQuantity = (productId: number, size: string, color: string, newQuantity: number) => {
-    if (newQuantity < 1) return;
-    dispatch({
-      type: "UPDATE_QUANTITY",
-      payload: { productId, size, color, quantity: newQuantity },
-    });
+  const total = state.items.reduce((acc, item) => acc + item.price, 0);
+
+  const removeItem = (courtId: string, date: string, timeSlot: string) => {
+    dispatch({ type: "REMOVE_FROM_CART", payload: { courtId, date, timeSlot } });
   };
 
-  const removeItem = (productId: number, size: string, color: string) => {
-    dispatch({
-      type: "REMOVE_FROM_CART",
-      payload: { productId, size, color },
-    });
-  };
+  if (!mounted) return null;
 
   if (state.items.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-20 text-center">
-        <h1 className="text-3xl font-bold mb-6">Giỏ hàng trống</h1>
-        <p className="text-zinc-400 mb-8">Bạn chưa có sản phẩm nào trong giỏ hàng.</p>
-        <Link
-          href="/"
-          className="inline-block bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-xl transition-colors"
-        >
-          Tiếp tục mua sắm
-        </Link>
+      <div className="container mx-auto px-4 py-24 text-center min-h-[60vh] flex flex-col justify-center">
+        <div className="w-24 h-24 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </div>
+        <h1 className="text-3xl font-bold mb-4 text-slate-800">Lịch đặt của bạn trống</h1>
+        <p className="text-slate-500 mb-8 max-w-md mx-auto">
+          Bạn chưa chọn ca sân nào. Hãy quay lại trang chủ để tìm và chốt lịch sân phù hợp nhé!
+        </p>
+        <div>
+          <Link href="/" className="inline-block px-8 py-4 bg-blue-600 hover:bg-blue-700 shadow-md hover:shadow-lg text-white rounded-xl font-bold transition-all">
+            Tìm Sân Ngay
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="container mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold mb-8">Giỏ Hàng</h1>
+      <h1 className="text-3xl font-bold mb-8 text-slate-800">Chi tiết Lịch Đặt</h1>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-4">
           {state.items.map((item, idx) => (
-            <div key={idx} className="flex flex-col sm:flex-row items-center gap-6 p-6 bg-zinc-900 border border-zinc-800 rounded-2xl relative">
+            <div key={idx} className="flex flex-col sm:flex-row items-center gap-6 p-5 bg-white border border-slate-200 shadow-sm rounded-2xl relative">
               <button 
-                onClick={() => removeItem(item.product.id, item.selectedSize, item.selectedColor)}
-                className="absolute top-4 right-4 text-zinc-500 hover:text-red-500 transition-colors"
+                onClick={() => removeItem(item.court.id, item.date, item.timeSlot)}
+                className="absolute top-4 right-4 text-slate-400 hover:text-rose-500 transition-colors"
               >
-                ✕
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
               </button>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={item.product.image} alt={item.product.name} className="w-24 h-24 object-cover rounded-xl" />
+              <img src={item.court.image} alt={item.court.name} className="w-20 h-20 object-cover rounded-xl" />
               <div className="flex-1">
-                <Link href={`/product/${item.product.id}`} className="text-lg font-bold hover:text-purple-400">
-                  {item.product.name}
-                </Link>
-                <p className="text-zinc-400 text-sm mt-1">Phân loại: {item.selectedColor}, {item.selectedSize}</p>
-                <p className="text-purple-400 font-bold mt-2">{formatVND(item.product.price)}</p>
+                <p className="text-lg font-bold text-slate-800">{item.court.name}</p>
+                <p className="text-slate-500 text-sm mt-1">Ngày chơi: <strong>{item.date.split('-').reverse().join('/')}</strong></p>
+                <p className="text-slate-500 text-sm">Ca chơi: <strong>{item.timeSlot}</strong></p>
               </div>
-              <div className="flex items-center gap-4 bg-zinc-950 px-4 py-2 rounded-lg border border-zinc-800">
-                <button 
-                  onClick={() => updateQuantity(item.product.id, item.selectedSize, item.selectedColor, item.quantity - 1)}
-                  className="text-zinc-400 hover:text-white"
-                >-</button>
-                <span className="w-8 text-center font-medium">{item.quantity}</span>
-                <button 
-                  onClick={() => updateQuantity(item.product.id, item.selectedSize, item.selectedColor, item.quantity + 1)}
-                  className="text-zinc-400 hover:text-white"
-                >+</button>
+              <div className="font-bold text-blue-600 bg-blue-50 px-4 py-2 rounded-lg border border-blue-100">
+                {item.price.toLocaleString('vi-VN')}đ
               </div>
             </div>
           ))}
         </div>
         
-        <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl h-fit">
-          <h2 className="text-xl font-bold mb-6">Tổng đơn hàng</h2>
+        <div className="bg-white border border-slate-200 shadow-sm p-6 rounded-2xl h-fit">
+          <h2 className="text-xl font-bold mb-6 text-slate-800">Tóm tắt thanh toán</h2>
           <div className="space-y-4 mb-6">
-            <div className="flex justify-between text-zinc-400">
-              <span>Tạm tính</span>
-              <span>{formatVND(subtotal)}</span>
+            <div className="flex justify-between text-slate-500">
+              <span>Số ca đã chọn</span>
+              <span className="font-bold text-slate-800">{state.items.length} ca</span>
             </div>
-            <div className="flex justify-between text-zinc-400">
-              <span>Phí vận chuyển</span>
-              <span>{formatVND(shipping)}</span>
-            </div>
-            <div className="border-t border-zinc-800 pt-4 flex justify-between font-bold text-lg">
-              <span>Tổng cộng</span>
-              <span className="text-purple-400">{formatVND(total)}</span>
+            <div className="border-t border-slate-200 pt-4 flex justify-between font-bold text-lg">
+              <span className="text-slate-800">Tổng cộng</span>
+              <span className="text-blue-600">{total.toLocaleString('vi-VN')}đ</span>
             </div>
           </div>
           <button 
-            onClick={() => router.push('/checkout')}
-            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold py-4 rounded-xl transition-all"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-md hover:shadow-lg transition-all"
+            onClick={() => alert("Chức năng Thanh toán cần Người A (Backend) kết nối với payOS!")}
           >
-            Tiến hành thanh toán
+            Tiến hành thanh toán (Thử nghiệm)
           </button>
         </div>
       </div>

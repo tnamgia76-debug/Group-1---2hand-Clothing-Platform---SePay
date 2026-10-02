@@ -1,10 +1,27 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #7c3aed;
-  --color-secondary: #2563eb;
+  --color-primary: #3b82f6;
+  --color-secondary: #4f46e5;
 }
 
 body {
-  @apply bg-zinc-950 text-white antialiased min-h-screen flex flex-col;
+  @apply bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col;
+}
+
+/* Custom horizontal scrollbar for the table in Light Mode */
+.custom-scrollbar::-webkit-scrollbar {
+  height: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9; 
+  border-radius: 8px;
+  margin: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1; 
+  border-radius: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8; 
 }
