@@ -1,0 +1,96 @@
+# 🚀 Kế Hoạch Vibe Code: Nền tảng Đặt Sân Cầu Lông (Tích hợp payOS)
+
+> **Mục tiêu:** Website trung gian cho phép khách hàng tìm sân, chọn giờ, và thanh toán online qua VietQR (payOS). Tự động xác nhận giao dịch.
+> **Thời gian:** ~1h30 | **Team:** 4 người (A, B, C, D)  
+> **Tech Stack:** Next.js (App Router) + TailwindCSS + payOS SDK + Vercel
+
+---
+
+## 🗺️ Quy Tắc Làm Việc Nhóm (Cực Quan Trọng)
+Để 4 người cùng code song song trong thời gian ngắn mà **không bị conflict khi ghép code**, team tuân thủ nguyên tắc:
+👉 **Ai được phân công file nào thì CHỈ ĐƯỢC code trong file đó.** 
+👉 Mọi kiểu dữ liệu dùng chung (Court, CartItem...) đã được Người A định nghĩa sẵn ở `src/lib/types.ts`.
+👉 Cứ thỏa sức sáng tạo về Giao diện (UI/UX) theo phong cách của mỗi người, miễn là đúng nghiệp vụ!
+
+---
+
+## 🧑‍💻 Phân Chia Roles & Scope Công Việc
+
+### 🟢 NGƯỜI A (Leader & Backend Integration)
+**Vai trò:** Khởi tạo kiến trúc, thiết lập API thanh toán và triển khai hệ thống.
+**Phạm vi File (Scope):**
+- Toàn bộ config (`package.json`, `.env`).
+- `src/lib/types.ts`, `src/lib/courts.ts`, `src/lib/utils.ts`.
+- `src/lib/payos.ts`.
+- `src/app/api/create-payment/route.ts` & `src/app/api/webhook/route.ts`.
+
+**Nhiệm vụ:**
+1. Khởi tạo skeleton project, push lên GitHub cho cả team clone về.
+2. Thiết lập cấu hình SDK payOS (lấy API keys từ dashboard payOS).
+3. Viết API Endpoint `/api/create-payment` (tạo link thanh toán) và `/api/webhook` (xác thực giao dịch tự động).
+4. Trực tiếp kết nối và test thử luồng thanh toán với payOS xem có tạo mã QR được không.
+5. Cuối giờ: Merge code của B, C, D lại. Deploy toàn bộ lên Vercel và cấu hình URL Webhook live.
+
+---
+
+### 🔵 NGƯỜI B (UI/UX Foundation)
+**Vai trò:** Xây dựng các UI Components dùng chung (Header, Footer, Card, Theme).
+**Phạm vi File (Scope):**
+- `src/app/globals.css`.
+- Các file trong `src/components/` (VD: `Navbar.tsx`, `Footer.tsx`, `CourtCard.tsx`, `LoadingSpinner.tsx`).
+
+**Nhiệm vụ:**
+1. Định hình phong cách thiết kế (Dark theme, Light theme, phong cách thể thao neon, v.v. - *tự do sáng tạo*).
+2. Xây dựng Navbar (có Logo, Menu, và biểu tượng Giỏ hàng/Lịch đặt sân).
+3. Xây dựng Component `CourtCard` để tái sử dụng: Nhận props là object `Court` và render ra giao diện Card (hiển thị ảnh sân, giá/giờ, tag tiện ích).
+4. Làm Footer cho website.
+
+---
+
+### 🟡 NGƯỜI C (Core Flow - Tìm & Chọn Sân)
+**Vai trò:** Xây dựng luồng tìm kiếm và chọn lịch đặt sân.
+**Phạm vi File (Scope):**
+- `src/app/page.tsx` (Trang chủ).
+- `src/app/court/[id]/page.tsx` (Chi tiết Sân).
+
+**Nhiệm vụ:**
+1. **Trang chủ:** Thiết kế giao diện danh sách các cụm sân cầu lông (lấy mock data từ `courts.ts`). Sử dụng `CourtCard` do Người B làm để hiển thị (*tự do sáng tạo layout Grid, slider, banner...*).
+2. **Chi tiết Sân:** Làm giao diện chi tiết thông tin sân. Quan trọng nhất là thiết kế **Bộ chọn Ngày và Giờ (Time Slots)**. 
+3. Khi người dùng chốt giờ, bấm nút thì gọi hàm `addToCart()` (sẽ do Người D cung cấp trong Context) để đẩy ca đặt vào giỏ.
+
+---
+
+### 🟣 NGƯỜI D (Checkout & Payment State)
+**Vai trò:** Quản lý state Giỏ hàng và luồng Checkout thanh toán.
+**Phạm vi File (Scope):**
+- `src/context/CartContext.tsx` (hoặc BookingContext).
+- `src/app/cart/page.tsx` (Giỏ đặt sân).
+- `src/app/checkout/page.tsx` (Thanh toán).
+- `src/app/payment/success/page.tsx` & `src/app/payment/cancel/page.tsx`.
+
+**Nhiệm vụ:**
+1. **Context:** Dùng React Context / useReducer để quản lý danh sách các ca sân khách vừa chọn. Xử lý lưu localStorage.
+2. **Giỏ hàng:** Hiển thị danh sách các ca sân đang muốn đặt, cho phép xóa, tính tổng tiền.
+3. **Checkout:** Form thu thập thông tin người đặt (Tên, SĐT). Bấm nút "Thanh Toán" thì gọi Fetch API tới `/api/create-payment` (do Người A làm) và Redirect khách sang trang quét mã QR của payOS.
+4. **Trang phản hồi:** Làm giao diện trang Success (thành công) và Cancel (thất bại) đẹp mắt.
+
+---
+
+## 🛠️ Quy trình làm việc (Git Flow)
+
+1. **Người A** push source code khung lên branch `main`.
+2. B, C, D pull code về máy, chạy lệnh `npm install`.
+3. Mỗi người tự rẽ nhánh riêng:
+   - `git checkout -b feature-ui-nguoi-b`
+   - `git checkout -b feature-flow-nguoi-c`
+   - `git checkout -b feature-payment-nguoi-d`
+4. Có thể dùng ChatGPT, Claude hoặc Google AI Studio để sinh mã UI nhanh.
+5. Sau khi code và test ổn, push nhánh của mình lên GitHub.
+6. **Người A** tiến hành gộp nhánh (Merge PR). Vì mỗi người code các file và thư mục khác nhau, quá trình merge sẽ KHÔNG BỊ CONFLICT.
+
+---
+
+## 💡 Điểm sáng chói cho buổi thuyết trình (A+)
+- **Giải quyết bài toán thật:** Chuyển từ "Gọi điện đặt lịch -> Chuyển khoản tay -> Ghi sổ dễ nhầm lẫn" sang "Tự động hoàn toàn với QR Code Open Banking".
+- **Real-time:** Tiền vào tài khoản chủ sân -> Webhook từ payOS báo về web trong vài giây -> Lịch sân được tự động khóa lại ngay lập tức (không ai khác đặt trùng được).
+- **Trải nghiệm:** Khách hàng không cần nhập tay số tài khoản hay số tiền, chỉ cần bật app ngân hàng quét là xong. Khó sai sót, không thể gửi bill giả.

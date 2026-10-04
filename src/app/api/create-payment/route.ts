@@ -13,7 +13,6 @@ export async function POST(req: NextRequest) {
       buyerName: body.buyerName,
       buyerPhone: body.buyerPhone,
       buyerEmail: body.buyerEmail,
-      buyerAddress: body.buyerAddress,
       items: body.items.map((item) => ({
         name: item.name,
         quantity: item.quantity,

@@ -1,10 +1,9 @@
 import PayOS from "@payos/node";
 
-// Đọc key từ environment variables (.env.local)
 const payos = new PayOS(
-  process.env.PAYOS_CLIENT_ID as string,
-  process.env.PAYOS_API_KEY as string,
-  process.env.PAYOS_CHECKSUM_KEY as string
+  process.env.PAYOS_CLIENT_ID || "client_id",
+  process.env.PAYOS_API_KEY || "api_key",
+  process.env.PAYOS_CHECKSUM_KEY || "checksum_key"
 );
 
 export default payos;
