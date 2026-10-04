@@ -83,12 +83,12 @@ export default function CartPage() {
               <span className="text-blue-600">{total.toLocaleString('vi-VN')}đ</span>
             </div>
           </div>
-          <button 
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-md hover:shadow-lg transition-all"
-            onClick={() => alert("Chức năng Thanh toán cần Người A (Backend) kết nối với payOS!")}
+          <Link 
+            href="/checkout"
+            className="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-md hover:shadow-lg transition-all"
           >
-            Tiến hành thanh toán (Thử nghiệm)
-          </button>
+            Tiến hành thanh toán
+          </Link>
         </div>
       </div>
     </div>

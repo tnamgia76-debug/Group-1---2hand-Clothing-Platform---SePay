@@ -19,8 +19,10 @@ const timeSlots = generateTimeSlots();
 export default function CourtDetail() {
   const params = useParams();
   const router = useRouter();
-  const id = params.id as string;
+  const id = params?.id as string;
   
+  if (!id) return <div className="p-8 text-white">Đang tải...</div>;
+
   const court = getCourtById(id);
 
   const { dispatch } = useCart();
