@@ -1,35 +1,38 @@
 // ===== COURT =====
 export interface Court {
-  id: number;
+  id: string; // Updated to string since we use it in URL params
   name: string;
-  slug: string;
+  slug?: string; // Optional since frontend may not use it
   pricePerHour: number;
   image: string;
   images?: string[];
-  location: string;
-  description: string;
-  amenities: string[]; // Trà đá, Wifi, Giữ xe, Thảm xịn...
-  isAvailable: boolean;
+  address: string; // Updated from location to match frontend
+  district: string; // Added for frontend filtering
+  ward: string; // Added for frontend filtering
+  numberOfCourts: number; // Added for frontend grid logic
+  description?: string;
+  amenities: string[]; 
+  isAvailable?: boolean;
 }
 
 // ===== BOOKING / CART =====
 export interface CartItem {
   court: Court;
   date: string; // YYYY-MM-DD
-  timeSlot: string; // VD: "18:00 - 19:30"
-  duration: number; // số giờ, VD: 1.5
+  timeSlot: string; // VD: "Sân 2 (18:00)"
   price: number;
 }
 
 export interface CartState {
   items: CartItem[];
-  totalItems: number;
-  totalAmount: number;
+  totalItems?: number;
+  totalAmount?: number;
 }
 
 export type CartAction =
-  | { type: "ADD_ITEM"; payload: CartItem }
-  | { type: "REMOVE_ITEM"; payload: { courtId: number; date: string; timeSlot: string } }
+  | { type: "INIT_CART"; payload: CartItem[] }
+  | { type: "ADD_TO_CART"; payload: CartItem }
+  | { type: "REMOVE_FROM_CART"; payload: { courtId: string; date: string; timeSlot: string } }
   | { type: "CLEAR_CART" };
 
 // ===== PAYMENT =====

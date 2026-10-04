@@ -1,26 +1,12 @@
 "use client";
 
 import React, { createContext, useContext, useReducer, useEffect, useState } from "react";
-
-export interface BookingItem {
-  court: any;
-  date: string;
-  timeSlot: string;
-  price: number;
-}
-
-interface CartState {
-  items: BookingItem[];
-}
-
-type CartAction =
-  | { type: "INIT_CART"; payload: BookingItem[] }
-  | { type: "ADD_TO_CART"; payload: BookingItem }
-  | { type: "REMOVE_FROM_CART"; payload: { courtId: string; date: string; timeSlot: string } }
-  | { type: "CLEAR_CART" };
+import { CartItem, CartState, CartAction } from "@/lib/types";
 
 const initialState: CartState = {
   items: [],
+  totalItems: 0,
+  totalAmount: 0,
 };
 
 const CartContext = createContext<{
@@ -30,24 +16,41 @@ const CartContext = createContext<{
 
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
-    case "INIT_CART":
-      return { ...state, items: action.payload };
+    case "INIT_CART": {
+      const items = action.payload;
+      return { 
+        ...state, 
+        items,
+        totalItems: items.length,
+        totalAmount: items.reduce((acc, item) => acc + item.price, 0)
+      };
+    }
     case "ADD_TO_CART": {
       const exists = state.items.some(
         (i) => i.court.id === action.payload.court.id && i.date === action.payload.date && i.timeSlot === action.payload.timeSlot
       );
       if (exists) return state;
-      return { ...state, items: [...state.items, action.payload] };
+      const newItems = [...state.items, action.payload];
+      return { 
+        ...state, 
+        items: newItems,
+        totalItems: newItems.length,
+        totalAmount: newItems.reduce((acc, item) => acc + item.price, 0)
+      };
     }
-    case "REMOVE_FROM_CART":
+    case "REMOVE_FROM_CART": {
+      const newItems = state.items.filter(
+        (i) => !(i.court.id === action.payload.courtId && i.date === action.payload.date && i.timeSlot === action.payload.timeSlot)
+      );
       return {
         ...state,
-        items: state.items.filter(
-          (i) => !(i.court.id === action.payload.courtId && i.date === action.payload.date && i.timeSlot === action.payload.timeSlot)
-        ),
+        items: newItems,
+        totalItems: newItems.length,
+        totalAmount: newItems.reduce((acc, item) => acc + item.price, 0)
       };
+    }
     case "CLEAR_CART":
-      return { ...state, items: [] };
+      return { ...state, items: [], totalItems: 0, totalAmount: 0 };
     default:
       return state;
   }

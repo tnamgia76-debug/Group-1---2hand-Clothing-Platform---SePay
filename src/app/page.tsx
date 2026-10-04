@@ -3,15 +3,15 @@
 import { useState } from "react";
 import Link from "next/link";
 import CourtCard from "@/components/CourtCard";
-import { mockCourts } from "@/lib/mockData";
+import { courts } from "@/lib/courts";
 
 export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
-  const totalPages = Math.ceil(mockCourts.length / itemsPerPage);
+  const totalPages = Math.ceil(courts.length / itemsPerPage);
 
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentCourts = mockCourts.slice(startIndex, startIndex + itemsPerPage);
+  const currentCourts = courts.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -35,7 +35,7 @@ export default function Home() {
       <section className="max-w-6xl mx-auto" id="all-courts">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-bold text-slate-800">Tất Cả Các Cụm Sân</h2>
-          <span className="text-slate-500 font-medium bg-slate-100 px-4 py-1.5 rounded-full text-sm">{mockCourts.length} sân</span>
+          <span className="text-slate-500 font-medium bg-slate-100 px-4 py-1.5 rounded-full text-sm">{courts.length} sân</span>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12 min-h-[400px]">

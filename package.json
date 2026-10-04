@@ -9,7 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@payos/node": "^2.0.5",
+    "@payos/node": "^1.0.8",
     "canvas-confetti": "^1.9.4",
     "next": "16.3.6",
     "react": "19.2.8",

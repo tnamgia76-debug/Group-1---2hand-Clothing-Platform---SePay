@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useParams, notFound, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useCart } from "@/context/CartContext";
-import { mockCourts } from "@/lib/mockData";
+import { courts, getCourtById } from "@/lib/courts";
 
 const generateTimeSlots = () => {
   const slots = [];
@@ -21,7 +21,7 @@ export default function CourtDetail() {
   const router = useRouter();
   const id = params.id as string;
   
-  const court = mockCourts.find((c) => c.id === id);
+  const court = getCourtById(id);
 
   const { dispatch } = useCart();
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);

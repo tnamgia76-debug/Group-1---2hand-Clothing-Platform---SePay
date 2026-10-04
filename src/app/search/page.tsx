@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import CourtCard from "@/components/CourtCard";
-import { mockCourts } from "@/lib/mockData";
+import { courts } from "@/lib/courts";
 
 const locations = {
   "Hai Bà Trưng": ["Bách Khoa", "Minh Khai", "Đồng Tâm", "Thanh Nhàn"],
@@ -36,7 +36,7 @@ export default function SearchPage() {
 
   let filteredCourts = [];
   if (isFiltering) {
-    filteredCourts = mockCourts.filter(c => {
+    filteredCourts = courts.filter(c => {
       if (selectedDistrict && c.district !== selectedDistrict) return false;
       if (selectedWard && c.ward !== selectedWard) return false;
       if (searchName && !c.name.toLowerCase().includes(searchName.toLowerCase())) return false;
@@ -44,7 +44,7 @@ export default function SearchPage() {
     });
   } else {
     // Sân nổi bật mặc định khi chưa có bộ lọc
-    filteredCourts = mockCourts.slice(0, 6);
+    filteredCourts = courts.slice(0, 6);
   }
 
   const totalPages = Math.ceil(filteredCourts.length / itemsPerPage);
